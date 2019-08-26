@@ -58,6 +58,8 @@ NdGraph::~NdGraph()
 
 这时使用抽象基类Graph的指针指向派生类的对象，则析构时派生类析构函数不会被调用，因此派生类对象不能被正确析构。
 
+![avatar](https://github.com/Happyxianyueveryday/cppnote/blob/master/1.%20%20%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0/screenshot/QQ%E6%88%AA%E5%9B%BE20190827015425.png)
+
 ```
 int main(void)
 {	
@@ -81,3 +83,7 @@ class Graph
     virtual ~Graph() {}                     // 抽象基类的虚析构函数 
 };
 ```
+
+修改后的执行结果如下。
+
+![avatar](https://github.com/Happyxianyueveryday/cppnote/blob/master/1.%20%20%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0/screenshot/QQ%E6%88%AA%E5%9B%BE20190827015451.png)
