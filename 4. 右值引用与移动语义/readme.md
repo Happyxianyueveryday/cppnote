@@ -113,8 +113,8 @@ other._length = 0;
 return (*this);
 ```
 
+不难看出，对于使用了堆空间的类，移动构造函数/移动赋值运算符除了提供右值引用的处理外，还相当于对象浅拷贝方法，而拷贝构造函数/拷贝赋值运算符则相当于深拷贝方法，如下图所示。
 
-如下图所示。
 ![avatar](https://github.com/Happyxianyueveryday/cppnote/blob/master/4.%20%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8%E4%B8%8E%E7%A7%BB%E5%8A%A8%E8%AF%AD%E4%B9%89/pics/4427263-81a47fdc9b8d9e98.webp)
 
 为什么对于拷贝源对象指针成员b，需要在移动后将其赋值为nullptr呢？这是为了防止二次析构，如果不赋值为nullptr，拷贝源对象会对其指向的对象析构一次，当前对象也会析构一次，从而引发运行时错误。
