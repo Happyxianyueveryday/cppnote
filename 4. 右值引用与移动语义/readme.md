@@ -53,12 +53,66 @@ function(c);
 Array array;     // Array是一个容器类，Element是一个元素类
 array.push(Element("abc"));   // Element是一个右值，直接将右值用于传参，会调用Element的拷贝构造函数拷贝一份临时值的副本给形参，然后临时值被销毁，效率极低，临时值本身也没有得到很好的利用。
 ```
-上述情形中，实际上没有必要拷贝一份对象，为了直接利用右值Element()本身，只需要为Element类创建移动构造函数和移动赋值运算符即可。类的移动构造函数和移动赋值运算符需要做的工作总结为：
+上述情形中，实际上没有必要拷贝一份对象，为了直接利用右值Element()本身，只需要为Element类创建移动构造函数和移动赋值运算符即可。
 
-+ **接受传入的右值引用参数other，该引用不能是底层const的。**
-+ **对于拷贝源对象的非指针成员a，直接将其赋值给当前对象的同名成员变量上，即: (\*this).a=other.a。**
-+ **对于拷贝源对象的指针成员b，将其赋值给当前对象的同名成员变量上后，修改该指针成员b为nullptr，即: (\*this).b=other.b; other.b=nullptr。**
-+ **移动赋值运算符需要额外做防止自身拷贝和返回(\*this)两个操作。
+关于类的移动构造函数和移动赋值运算符需要做的工作，我个人觉得微软的cpp文档中介绍的很好，如下所示，也可以参见链接https://docs.microsoft.com/zh-cn/previous-versions/dd293665(v=vs.110) ：
+
+#### 定义移动构造函数
++ 创建移动构造函数定义，移动构造函数接受一个拷贝源对象的右值引用。
+```
+MemoryBlock(MemoryBlock&& other)
+{
+}
+```
+
++ 从拷贝源对象中拷贝各个成员。
+```
+_data = other._data;
+_length = other._length;
+```
+
++ 将拷贝源对象的各个成员设置为默认值，即默认构造函数中的取值。（这是为了避免重复析构）
+```
+other._data = NULL;
+other._length = 0;
+```
+
+#### 定义移动赋值运算符
++ 创建移动赋值运算符定义，如下所示。
+```
+MemoryBlock& operator= (MemoryBlock&& other)
+{
+}
+```
+
++ 判断是否为自身赋值，若为自身赋值则直接返回\*this。
+```
+if(&other==this)
+return (*this);
+```
+
++ 若当前对象申请了堆空间，则释放自身对象的成员所占用的堆空间。
+```
+delete [] data;
+```
+
++ 从拷贝源对象中拷贝各个成员。
+```
+_data = other._data;
+_length = other._length;
+```
+
++ 将拷贝源对象的各个成员设置为默认值，即默认构造函数中的取值。（这是为了避免重复析构）
+```
+other._data = NULL;
+other._length = 0;
+```
+
++ 返回当前对象的左值引用，即\*this。
+```
+return (*this);
+```
+
 
 如下图所示。
 ![avatar](https://github.com/Happyxianyueveryday/cppnote/blob/master/4.%20%E5%8F%B3%E5%80%BC%E5%BC%95%E7%94%A8%E4%B8%8E%E7%A7%BB%E5%8A%A8%E8%AF%AD%E4%B9%89/pics/4427263-81a47fdc9b8d9e98.webp)
